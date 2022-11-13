@@ -122,6 +122,7 @@ type StoreDevtools<S> = S extends {
 export interface DevtoolsOptions extends Config {
   enabled?: boolean
   anonymousActionType?: string
+  storeName?: string
 }
 
 type Devtools = <
@@ -147,13 +148,21 @@ type DevtoolsImpl = <T>(
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+let extensionGlobal
+
+const stores = []
+const storeInits = []
+
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
     type S = ReturnType<typeof fn>
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
-    const { enabled, anonymousActionType, ...options } = devtoolsOptions
+    const { enabled, anonymousActionType, storeName, ...options } =
+      devtoolsOptions
     let extensionConnector:
       | typeof window['__REDUX_DEVTOOLS_EXTENSION__']
       | false
@@ -173,22 +182,61 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const extension = extensionConnector.connect(options)
+    let extension = extensionGlobal;
+    if (extensionGlobal === undefined && storeName !== undefined) {
+      extensionGlobal = extensionConnector.connect(options)
+      extension = extensionGlobal
+    }
+    if (storeName === undefined) {
+      extension = extensionConnector.connect(options)
+    }
 
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
       const r = set(state, replace)
       if (!isRecording) return r
-      extension.send(
-        nameOrAction === undefined
-          ? { type: anonymousActionType || 'anonymous' }
-          : typeof nameOrAction === 'string'
-          ? { type: nameOrAction }
-          : nameOrAction,
-        get()
-      )
+      if (storeName === undefined) {
+        extension.send(
+          nameOrAction === undefined
+            ? { type: anonymousActionType || 'anonymous' }
+            : typeof nameOrAction === 'string'
+            ? { type: nameOrAction }
+            : nameOrAction,
+          get()
+        )
+        return r
+      }
+      const storesStates = stores.map((storeState) => ({
+        ...storeState.getState(),
+        store: storeState.store,
+      }))
+      const currentStates = {}
+      storesStates.forEach((storeState) => {
+        currentStates[String(storeState.store)] = storeState
+      })
+      function getNameOrAction(name) {
+        if (name !== undefined && typeof name === 'string') {
+          return { type: name }
+        }
+        if (
+          name !== undefined &&
+          typeof name !== 'string' &&
+          storeName !== undefined
+        ) {
+          return `${storeName}/${name.type}`
+        }
+        if (name !== undefined) {
+          return name
+        }
+        return { type: anonymousActionType || 'anonymous' }
+      }
+      extension.send(getNameOrAction(nameOrAction), {
+        ...currentStates,
+        [storeName]: { ...api.getState(), store: storeName },
+      })
       return r
     }
+
     const setStateFromDevtools: StoreApi<S>['setState'] = (...a) => {
       const originalIsRecording = isRecording
       isRecording = false
@@ -197,7 +245,18 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     const initialState = fn(api.setState, get, api)
-    extension.init(initialState)
+    if (storeName === undefined) {
+      extension.init(initialState)
+    } else {
+      stores.push({ ...api, store: storeName })
+      storeInits.push({ ...initialState, store: storeName })
+      const inits = {}
+      storeInits.forEach((storeState) => {
+        inits[String(storeState.store)] = storeState
+      })
+      extension.init(inits)
+      console.warn('zustand initialized with initial state', inits)
+    }
 
     if (
       (api as any).dispatchFromDevtools &&
@@ -241,7 +300,12 @@ const devtoolsImpl: DevtoolsImpl =
             message.payload,
             (action) => {
               if (action.type === '__setState') {
-                setStateFromDevtools(action.state as PartialState)
+                if (
+                  JSON.stringify(api.getState()) !==
+                  JSON.stringify(action.state[storeName])
+                ) {
+                  setStateFromDevtools(action.state as PartialState)
+                }
                 return
               }
 
@@ -255,21 +319,71 @@ const devtoolsImpl: DevtoolsImpl =
           switch (message.payload.type) {
             case 'RESET':
               setStateFromDevtools(initialState)
-              return extension.init(api.getState())
+              if (storeName === undefined) {
+                extension.init(api.getState())
+                return
+              }
+              // eslint-disable-next-line no-case-declarations
+              const storesStates1 = stores.map((storeState) => ({
+                ...storeState.getState(),
+                store: storeState.store,
+              }))
+              // eslint-disable-next-line no-case-declarations
+              const currentStates1 = {}
+              storesStates1.forEach((storeState) => {
+                currentStates1[String(storeState.store)] = storeState
+              })
+              return extension.init(currentStates1)
 
             case 'COMMIT':
-              return extension.init(api.getState())
+              if (storeName === undefined) {
+                extension.init(api.getState())
+                return
+              }
+              // eslint-disable-next-line no-case-declarations
+              const storesStates2 = stores.map((storeState) => ({
+                ...storeState.getState(),
+                store: storeState.store,
+              }))
+              // eslint-disable-next-line no-case-declarations
+              const currentStates2 = {}
+              storesStates2.forEach((storeState) => {
+                currentStates2[String(storeState.store)] = storeState
+              })
+              return extension.init(currentStates2)
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
-                setStateFromDevtools(state)
-                extension.init(api.getState())
+                if (storeName === undefined) {
+                  setStateFromDevtools(state)
+                  extension.init(api.getState())
+                  return
+                }
+                setStateFromDevtools(state[storeName])
+                const storesStates3 = stores.map((storeState) => ({
+                  ...storeState.getState(),
+                  store: storeState.store,
+                }))
+                const currentStates3 = {}
+                storesStates3.forEach((storeState) => {
+                  currentStates3[String(storeState.store)] = storeState
+                })
+                extension.init(currentStates3)
               })
 
             case 'JUMP_TO_STATE':
             case 'JUMP_TO_ACTION':
               return parseJsonThen<S>(message.state, (state) => {
-                setStateFromDevtools(state)
+                if (storeName === undefined) {
+                  setStateFromDevtools(state)
+                  return
+                }
+                if (
+                  JSON.stringify(api.getState()) !==
+                  JSON.stringify(state[storeName])
+                ) {
+                  setStateFromDevtools(state[storeName])
+                }
               })
 
             case 'IMPORT_STATE': {
@@ -277,7 +391,11 @@ const devtoolsImpl: DevtoolsImpl =
               const lastComputedState =
                 nextLiftedState.computedStates.slice(-1)[0]?.state
               if (!lastComputedState) return
-              setStateFromDevtools(lastComputedState)
+              if (storeName === undefined) {
+                setStateFromDevtools(lastComputedState)
+              } else {
+                setStateFromDevtools(lastComputedState[storeName])
+              }
               extension.send(
                 null as any, // FIXME no-any
                 nextLiftedState
