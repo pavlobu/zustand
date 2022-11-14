@@ -402,6 +402,19 @@ const devtoolsImpl: DevtoolsImpl =
   }
 export const devtools = devtoolsImpl as unknown as Devtools
 
+type DevtoolsParams<T> = Parameters<typeof devtools<T>>
+const isDevEnv = process.env.REACT_APP_CUSTOM_NODE_ENV
+  ? process.env.REACT_APP_CUSTOM_NODE_ENV !== 'production'
+  : process.env.NODE_ENV !== 'production'
+export function devOnlyDevtools<T>(
+  ...params: DevtoolsParams<T>
+): DevtoolsParams<T>[0] {
+  if (isDevEnv) {
+    return devtools<T>(...params) as unknown as DevtoolsParams<T>[0]
+  }
+  return params[0]
+}
+
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
   try {
