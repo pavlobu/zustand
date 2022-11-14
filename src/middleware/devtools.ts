@@ -404,9 +404,9 @@ type DevtoolsParams<T> = Parameters<typeof devtools<T>>
 const isDevEnv = process.env.REACT_APP_CUSTOM_NODE_ENV
   ? process.env.REACT_APP_CUSTOM_NODE_ENV !== 'production'
   : process.env.NODE_ENV !== 'production'
-export function devOnlyDevtools<T>(
+export const devOnlyDevtools = <T>(
   ...params: DevtoolsParams<T>
-): DevtoolsParams<T>[0] {
+): DevtoolsParams<T>[0] => {
   if (isDevEnv) {
     return devtools<T>(...params) as unknown as DevtoolsParams<T>[0]
   }
