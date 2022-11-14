@@ -122,7 +122,7 @@ type StoreDevtools<S> = S extends {
 export interface DevtoolsOptions extends Config {
   enabled?: boolean
   anonymousActionType?: string
-  storeName?: string
+  store?: string
 }
 
 type Devtools = <
@@ -173,10 +173,9 @@ const getCurrentStoresStates = () => {
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    const { enabled, anonymousActionType, storeName, ...options } =
-      devtoolsOptions
+    const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
-    type S = ReturnType<typeof fn> & { [storeName: string]: S }
+    type S = ReturnType<typeof fn> & { [store: string]: S }
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
     let extensionConnector:
@@ -199,11 +198,11 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     let extension = extensionGlobal
-    if (extensionGlobal === undefined && storeName !== undefined) {
+    if (extensionGlobal === undefined && store !== undefined) {
       extensionGlobal = extensionConnector.connect(options)
       extension = extensionGlobal
     }
-    if (storeName === undefined) {
+    if (store === undefined) {
       extension = extensionConnector.connect(options)
     }
 
@@ -211,7 +210,7 @@ const devtoolsImpl: DevtoolsImpl =
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
       const r = set(state, replace)
       if (!isRecording) return r
-      if (storeName === undefined) {
+      if (store === undefined) {
         extension.send(
           nameOrAction === undefined
             ? { type: anonymousActionType || 'anonymous' }
@@ -231,9 +230,9 @@ const devtoolsImpl: DevtoolsImpl =
         if (
           name !== undefined &&
           typeof name !== 'string' &&
-          storeName !== undefined
+          store !== undefined
         ) {
-          return { type: `${storeName}/${name.type}` }
+          return { type: `${store}/${name.type}` }
         }
         if (name !== undefined) {
           return name
@@ -242,7 +241,7 @@ const devtoolsImpl: DevtoolsImpl =
       }
       extension.send(getNameOrAction(nameOrAction), {
         ...getCurrentStoresStates(),
-        [storeName]: { ...api.getState(), store: storeName },
+        [store]: { ...api.getState(), store },
       })
       return r
     }
@@ -255,11 +254,11 @@ const devtoolsImpl: DevtoolsImpl =
     }
 
     const initialState = fn(api.setState, get, api)
-    if (storeName === undefined) {
+    if (store === undefined) {
       extension.init(initialState)
     } else {
-      storeApis.push({ ...api, store: storeName })
-      initialStoreStates.push({ ...initialState, store: storeName })
+      storeApis.push({ ...api, store })
+      initialStoreStates.push({ ...initialState, store })
       const inits: Record<string, S> = {}
       initialStoreStates.forEach((storeState) => {
         inits[storeState.store] = storeState
@@ -311,13 +310,13 @@ const devtoolsImpl: DevtoolsImpl =
             (action) => {
               if (action.type === '__setState') {
                 if (action.type === '__setState') {
-                  if (storeName === undefined) {
+                  if (store === undefined) {
                     setStateFromDevtools(action.state as PartialState)
                     return
                   }
                   if (
                     JSON.stringify(api.getState()) !==
-                    JSON.stringify((action.state as S)[storeName])
+                    JSON.stringify((action.state as S)[store])
                   ) {
                     setStateFromDevtools(action.state as S)
                   }
@@ -335,13 +334,13 @@ const devtoolsImpl: DevtoolsImpl =
           switch (message.payload.type) {
             case 'RESET':
               setStateFromDevtools(initialState as S)
-              if (storeName === undefined) {
+              if (store === undefined) {
                 return extension.init(api.getState())
               }
               return extension.init(getCurrentStoresStates())
 
             case 'COMMIT':
-              if (storeName === undefined) {
+              if (store === undefined) {
                 extension.init(api.getState())
                 return
               }
@@ -349,27 +348,27 @@ const devtoolsImpl: DevtoolsImpl =
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
-                if (storeName === undefined) {
+                if (store === undefined) {
                   setStateFromDevtools(state)
                   extension.init(api.getState())
                   return
                 }
-                setStateFromDevtools(state[storeName] as S)
+                setStateFromDevtools(state[store] as S)
                 extension.init(getCurrentStoresStates())
               })
 
             case 'JUMP_TO_STATE':
             case 'JUMP_TO_ACTION':
               return parseJsonThen<S>(message.state, (state) => {
-                if (storeName === undefined) {
+                if (store === undefined) {
                   setStateFromDevtools(state)
                   return
                 }
                 if (
                   JSON.stringify(api.getState()) !==
-                  JSON.stringify(state[storeName])
+                  JSON.stringify(state[store])
                 ) {
-                  setStateFromDevtools(state[storeName] as S)
+                  setStateFromDevtools(state[store] as S)
                 }
               })
 
@@ -378,10 +377,10 @@ const devtoolsImpl: DevtoolsImpl =
               const lastComputedState =
                 nextLiftedState.computedStates.slice(-1)[0]?.state
               if (!lastComputedState) return
-              if (storeName === undefined) {
+              if (store === undefined) {
                 setStateFromDevtools(lastComputedState)
               } else {
-                setStateFromDevtools(lastComputedState[storeName])
+                setStateFromDevtools(lastComputedState[store])
               }
               extension.send(
                 null as any, // FIXME no-any
@@ -400,6 +399,19 @@ const devtoolsImpl: DevtoolsImpl =
     return initialState
   }
 export const devtools = devtoolsImpl as unknown as Devtools
+
+type DevtoolsParams<T> = Parameters<typeof devtools<T>>
+const isDevEnv = process.env.REACT_APP_CUSTOM_NODE_ENV
+  ? process.env.REACT_APP_CUSTOM_NODE_ENV !== 'production'
+  : process.env.NODE_ENV !== 'production'
+export function devOnlyDevtools<T>(
+  ...params: DevtoolsParams<T>
+): DevtoolsParams<T>[0] {
+  if (isDevEnv) {
+    return devtools<T>(...params) as unknown as DevtoolsParams<T>[0]
+  }
+  return params[0]
+}
 
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
