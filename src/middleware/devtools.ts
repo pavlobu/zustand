@@ -148,21 +148,37 @@ type DevtoolsImpl = <T>(
 
 export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-let extensionGlobal
+let extensionGlobal: ReturnType<
+  NonNullable<Window['__REDUX_DEVTOOLS_EXTENSION__']>['connect']
+>
 
-const stores = []
-const storeInits = []
+const storeApis: (StoreApi<any> & { store: string })[] = []
+const initialStores: (any & { store: string })[] = []
+
+const getCurrentStoresStates = () => {
+  const storesStates = storeApis.map((storeState) => ({
+    ...storeState.getState(),
+    store: storeState.store,
+  }))
+  const currentStates: Record<
+    string,
+    ReturnType<StoreApi<any>['getState']>
+  > = {}
+  storesStates.forEach((storeState) => {
+    currentStates[String(storeState.store)] = storeState
+  })
+  return currentStates
+}
 
 const devtoolsImpl: DevtoolsImpl =
   (fn, devtoolsOptions = {}) =>
   (set, get, api) => {
-    type S = ReturnType<typeof fn>
-    type PartialState = Partial<S> | ((s: S) => Partial<S>)
-
     const { enabled, anonymousActionType, storeName, ...options } =
       devtoolsOptions
+
+    type S = ReturnType<typeof fn> & { [storeName: string]: S }
+    type PartialState = Partial<S> | ((s: S) => Partial<S>)
+
     let extensionConnector:
       | typeof window['__REDUX_DEVTOOLS_EXTENSION__']
       | false
@@ -182,7 +198,7 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    let extension = extensionGlobal;
+    let extension = extensionGlobal
     if (extensionGlobal === undefined && storeName !== undefined) {
       extensionGlobal = extensionConnector.connect(options)
       extension = extensionGlobal
@@ -206,15 +222,9 @@ const devtoolsImpl: DevtoolsImpl =
         )
         return r
       }
-      const storesStates = stores.map((storeState) => ({
-        ...storeState.getState(),
-        store: storeState.store,
-      }))
-      const currentStates = {}
-      storesStates.forEach((storeState) => {
-        currentStates[String(storeState.store)] = storeState
-      })
-      function getNameOrAction(name) {
+      function getNameOrAction(
+        name?: string | { type: unknown }
+      ): Action<unknown> {
         if (name !== undefined && typeof name === 'string') {
           return { type: name }
         }
@@ -223,7 +233,7 @@ const devtoolsImpl: DevtoolsImpl =
           typeof name !== 'string' &&
           storeName !== undefined
         ) {
-          return `${storeName}/${name.type}`
+          return { type: `${storeName}/${name.type}` }
         }
         if (name !== undefined) {
           return name
@@ -231,7 +241,7 @@ const devtoolsImpl: DevtoolsImpl =
         return { type: anonymousActionType || 'anonymous' }
       }
       extension.send(getNameOrAction(nameOrAction), {
-        ...currentStates,
+        ...getCurrentStoresStates(),
         [storeName]: { ...api.getState(), store: storeName },
       })
       return r
@@ -248,11 +258,11 @@ const devtoolsImpl: DevtoolsImpl =
     if (storeName === undefined) {
       extension.init(initialState)
     } else {
-      stores.push({ ...api, store: storeName })
-      storeInits.push({ ...initialState, store: storeName })
-      const inits = {}
-      storeInits.forEach((storeState) => {
-        inits[String(storeState.store)] = storeState
+      storeApis.push({ ...api, store: storeName })
+      initialStores.push({ ...initialState, store: storeName })
+      const inits: Record<string, S> = {}
+      initialStores.forEach((storeState) => {
+        inits[storeState.store] = storeState
       })
       extension.init(inits)
       console.warn('zustand initialized with initial state', inits)
@@ -300,13 +310,19 @@ const devtoolsImpl: DevtoolsImpl =
             message.payload,
             (action) => {
               if (action.type === '__setState') {
-                if (
-                  JSON.stringify(api.getState()) !==
-                  JSON.stringify(action.state[storeName])
-                ) {
-                  setStateFromDevtools(action.state as PartialState)
+                if (action.type === '__setState') {
+                  if (storeName === undefined) {
+                    setStateFromDevtools(action.state as PartialState)
+                    return
+                  }
+                  if (
+                    JSON.stringify(api.getState()) !==
+                    JSON.stringify((action.state as S)[storeName])
+                  ) {
+                    setStateFromDevtools(action.state as S)
+                  }
+                  return
                 }
-                return
               }
 
               if (!(api as any).dispatchFromDevtools) return
@@ -318,39 +334,18 @@ const devtoolsImpl: DevtoolsImpl =
         case 'DISPATCH':
           switch (message.payload.type) {
             case 'RESET':
-              setStateFromDevtools(initialState)
+              setStateFromDevtools(initialState as S)
               if (storeName === undefined) {
-                extension.init(api.getState())
-                return
+                return extension.init(api.getState())
               }
-              // eslint-disable-next-line no-case-declarations
-              const storesStates1 = stores.map((storeState) => ({
-                ...storeState.getState(),
-                store: storeState.store,
-              }))
-              // eslint-disable-next-line no-case-declarations
-              const currentStates1 = {}
-              storesStates1.forEach((storeState) => {
-                currentStates1[String(storeState.store)] = storeState
-              })
-              return extension.init(currentStates1)
+              return extension.init(getCurrentStoresStates())
 
             case 'COMMIT':
               if (storeName === undefined) {
                 extension.init(api.getState())
                 return
               }
-              // eslint-disable-next-line no-case-declarations
-              const storesStates2 = stores.map((storeState) => ({
-                ...storeState.getState(),
-                store: storeState.store,
-              }))
-              // eslint-disable-next-line no-case-declarations
-              const currentStates2 = {}
-              storesStates2.forEach((storeState) => {
-                currentStates2[String(storeState.store)] = storeState
-              })
-              return extension.init(currentStates2)
+              return extension.init(getCurrentStoresStates())
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
@@ -359,16 +354,8 @@ const devtoolsImpl: DevtoolsImpl =
                   extension.init(api.getState())
                   return
                 }
-                setStateFromDevtools(state[storeName])
-                const storesStates3 = stores.map((storeState) => ({
-                  ...storeState.getState(),
-                  store: storeState.store,
-                }))
-                const currentStates3 = {}
-                storesStates3.forEach((storeState) => {
-                  currentStates3[String(storeState.store)] = storeState
-                })
-                extension.init(currentStates3)
+                setStateFromDevtools(state[storeName] as S)
+                extension.init(getCurrentStoresStates())
               })
 
             case 'JUMP_TO_STATE':
@@ -382,7 +369,7 @@ const devtoolsImpl: DevtoolsImpl =
                   JSON.stringify(api.getState()) !==
                   JSON.stringify(state[storeName])
                 ) {
-                  setStateFromDevtools(state[storeName])
+                  setStateFromDevtools(state[storeName] as S)
                 }
               })
 
