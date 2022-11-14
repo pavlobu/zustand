@@ -153,19 +153,19 @@ let extensionGlobal: ReturnType<
 >
 
 const storeApis: (StoreApi<any> & { store: string })[] = []
-const initialStores: (any & { store: string })[] = []
+const initialStoreStates: (any & { store: string })[] = []
 
 const getCurrentStoresStates = () => {
-  const storesStates = storeApis.map((storeState) => ({
-    ...storeState.getState(),
-    store: storeState.store,
+  const storesStates = storeApis.map((storeApi) => ({
+    ...storeApi.getState(),
+    store: storeApi.store,
   }))
   const currentStates: Record<
     string,
     ReturnType<StoreApi<any>['getState']>
   > = {}
   storesStates.forEach((storeState) => {
-    currentStates[String(storeState.store)] = storeState
+    currentStates[storeState.store] = storeState
   })
   return currentStates
 }
@@ -259,9 +259,9 @@ const devtoolsImpl: DevtoolsImpl =
       extension.init(initialState)
     } else {
       storeApis.push({ ...api, store: storeName })
-      initialStores.push({ ...initialState, store: storeName })
+      initialStoreStates.push({ ...initialState, store: storeName })
       const inits: Record<string, S> = {}
-      initialStores.forEach((storeState) => {
+      initialStoreStates.forEach((storeState) => {
         inits[storeState.store] = storeState
       })
       extension.init(inits)
