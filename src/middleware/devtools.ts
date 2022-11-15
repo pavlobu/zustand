@@ -196,6 +196,7 @@ const devtoolsImpl: DevtoolsImpl =
       }
       return fn(set, get, api)
     }
+    // return fn(set, get, api)
 
     let extension = extensionGlobal
     if (extensionGlobal === undefined && store !== undefined) {
@@ -205,7 +206,6 @@ const devtoolsImpl: DevtoolsImpl =
     if (store === undefined) {
       extension = extensionConnector.connect(options)
     }
-
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
       const r = set(state, replace)
@@ -245,14 +245,12 @@ const devtoolsImpl: DevtoolsImpl =
       })
       return r
     }
-
     const setStateFromDevtools: StoreApi<S>['setState'] = (...a) => {
       const originalIsRecording = isRecording
       isRecording = false
       set(...a)
       isRecording = originalIsRecording
     }
-
     const initialState = fn(api.setState, get, api)
     if (store === undefined) {
       extension.init(initialState)
@@ -266,7 +264,6 @@ const devtoolsImpl: DevtoolsImpl =
       extension.init(inits)
       console.warn('zustand initialized with initial state', inits)
     }
-
     if (
       (api as any).dispatchFromDevtools &&
       typeof (api as any).dispatch === 'function'
@@ -288,7 +285,6 @@ const devtoolsImpl: DevtoolsImpl =
         ;(originalDispatch as any)(...a)
       }
     }
-
     ;(
       extension as unknown as {
         // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
@@ -323,13 +319,11 @@ const devtoolsImpl: DevtoolsImpl =
                   return
                 }
               }
-
               if (!(api as any).dispatchFromDevtools) return
               if (typeof (api as any).dispatch !== 'function') return
               ;(api as any).dispatch(action)
             }
           )
-
         case 'DISPATCH':
           switch (message.payload.type) {
             case 'RESET':
@@ -338,14 +332,12 @@ const devtoolsImpl: DevtoolsImpl =
                 return extension.init(api.getState())
               }
               return extension.init(getCurrentStoresStates())
-
             case 'COMMIT':
               if (store === undefined) {
                 extension.init(api.getState())
                 return
               }
               return extension.init(getCurrentStoresStates())
-
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
                 if (store === undefined) {
@@ -356,7 +348,6 @@ const devtoolsImpl: DevtoolsImpl =
                 setStateFromDevtools(state[store] as S)
                 extension.init(getCurrentStoresStates())
               })
-
             case 'JUMP_TO_STATE':
             case 'JUMP_TO_ACTION':
               return parseJsonThen<S>(message.state, (state) => {
@@ -371,7 +362,6 @@ const devtoolsImpl: DevtoolsImpl =
                   setStateFromDevtools(state[store] as S)
                 }
               })
-
             case 'IMPORT_STATE': {
               const { nextLiftedState } = message.payload
               const lastComputedState =
@@ -388,30 +378,29 @@ const devtoolsImpl: DevtoolsImpl =
               )
               return
             }
-
             case 'PAUSE_RECORDING':
               return (isRecording = !isRecording)
           }
           return
       }
     })
-
     return initialState
   }
 export const devtools = devtoolsImpl as unknown as Devtools
 
-type DevtoolsParams<T> = Parameters<typeof devtools<T>>
 const isDevEnv = process.env.REACT_APP_CUSTOM_NODE_ENV
   ? process.env.REACT_APP_CUSTOM_NODE_ENV !== 'production'
   : process.env.NODE_ENV !== 'production'
-export const devOnlyDevtools = <T>(
-  ...params: DevtoolsParams<T>
-): DevtoolsParams<T>[0] => {
-  if (isDevEnv) {
-    return devtools<T>(...params) as unknown as DevtoolsParams<T>[0]
+const devOnlyDevtoolsImpl: DevtoolsImpl =
+  (fn, devtoolsOptions = {}) =>
+  (set, get, api) => {
+    if (isDevEnv) {
+      return devtools(fn, devtoolsOptions)(set, get, api)
+    }
+    return fn(set, get, api)
   }
-  return params[0]
-}
+
+export const devOnlyDevtools = devOnlyDevtoolsImpl as unknown as Devtools
 
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
