@@ -197,7 +197,6 @@ const devtoolsImpl: DevtoolsImpl =
       }
       return fn(set, get, api)
     }
-    // return fn(set, get, api)
 
     const name = options.name ?? ''
     let connection = connections[name]
@@ -209,6 +208,7 @@ const devtoolsImpl: DevtoolsImpl =
     if (store === undefined) {
       connection = extensionConnector.connect(options)
     }
+
     let isRecording = true
     ;(api.setState as NamedSet<S>) = (state, replace, nameOrAction) => {
       const r = set(state, replace)
@@ -248,12 +248,14 @@ const devtoolsImpl: DevtoolsImpl =
       })
       return r
     }
+
     const setStateFromDevtools: StoreApi<S>['setState'] = (...a) => {
       const originalIsRecording = isRecording
       isRecording = false
       set(...a)
       isRecording = originalIsRecording
     }
+
     const initialState = fn(api.setState, get, api)
     if (store === undefined) {
       connection?.init(initialState)
@@ -267,6 +269,7 @@ const devtoolsImpl: DevtoolsImpl =
       connection?.init(inits)
       console.warn('zustand initialized with initial state', inits)
     }
+
     if (
       (api as any).dispatchFromDevtools &&
       typeof (api as any).dispatch === 'function'
@@ -288,6 +291,7 @@ const devtoolsImpl: DevtoolsImpl =
         ;(originalDispatch as any)(...a)
       }
     }
+
     ;(
       connection as unknown as {
         // FIXME https://github.com/reduxjs/redux-devtools/issues/1097
@@ -322,11 +326,13 @@ const devtoolsImpl: DevtoolsImpl =
                   return
                 }
               }
+
               if (!(api as any).dispatchFromDevtools) return
               if (typeof (api as any).dispatch !== 'function') return
               ;(api as any).dispatch(action)
             }
           )
+
         case 'DISPATCH':
           switch (message.payload.type) {
             case 'RESET':
@@ -353,6 +359,7 @@ const devtoolsImpl: DevtoolsImpl =
                 setStateFromDevtools(state[store] as S)
                 connection?.init(getCurrentStoresStates())
               })
+
             case 'JUMP_TO_STATE':
             case 'JUMP_TO_ACTION':
               return parseJsonThen<S>(message.state, (state) => {
@@ -367,6 +374,7 @@ const devtoolsImpl: DevtoolsImpl =
                   setStateFromDevtools(state[store] as S)
                 }
               })
+
             case 'IMPORT_STATE': {
               const { nextLiftedState } = message.payload
               const lastComputedState =
@@ -383,6 +391,7 @@ const devtoolsImpl: DevtoolsImpl =
               )
               return
             }
+
             case 'PAUSE_RECORDING':
               return (isRecording = !isRecording)
           }
