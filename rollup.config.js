@@ -57,7 +57,7 @@ function createESMConfig(input, output) {
     plugins: [
       alias({
         entries: {
-          './vanilla': 'zustand/vanilla',
+          './vanilla': '@pavlobu/zustand/vanilla',
         },
       }),
       resolve({ extensions }),
@@ -83,7 +83,7 @@ function createCommonJSConfig(input, output) {
     plugins: [
       alias({
         entries: {
-          './vanilla': 'zustand/vanilla',
+          './vanilla': '@pavlobu/zustand/vanilla',
         },
       }),
       resolve({ extensions }),
@@ -112,14 +112,14 @@ function createUMDConfig(input, output, env) {
         // FIXME not yet supported
         'use-sync-external-store/shim/with-selector':
           'useSyncExternalStoreShimWithSelector',
-        'zustand/vanilla': 'zustandVanilla',
+        '@pavlobu/zustand/vanilla': 'zustandVanilla',
       },
     },
     external,
     plugins: [
       alias({
         entries: {
-          './vanilla': 'zustand/vanilla',
+          './vanilla': '@pavlobu/zustand/vanilla',
         },
       }),
       resolve({ extensions }),
@@ -144,7 +144,7 @@ function createSystemConfig(input, output, env) {
     plugins: [
       alias({
         entries: {
-          './vanilla': 'zustand/vanilla',
+          './vanilla': '@pavlobu/zustand/vanilla',
         },
       }),
       resolve({ extensions }),

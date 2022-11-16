@@ -8,7 +8,7 @@ nav: 8
 The difference when using TypeScript is that instead of writing `create(...)`, you have to write `create<T>()(...)` where `T` is the type of the state to annotate it. For example:
 
 ```ts
-import create from 'zustand'
+import create from '@pavlobu/zustand'
 
 interface BearState {
   bears: number
@@ -71,7 +71,7 @@ So what we're saying is, the inference failure in case of `createFoo` is not rea
 Zustand lies that it implemented `create`'s type, it implemented only the most part of it. Here's a simple proof by showing unsoundness. Consider the following code:
 
 ```ts
-import create from 'zustand/vanilla'
+import create from '@pavlobu/zustand/vanilla'
 
 const useBoundStore = create<{ foo: number }>()((_, get) => ({
   foo: get().foo,
@@ -136,8 +136,8 @@ This way, `T` gets inferred and you get to annotate `E`. Zustand has the same us
 Alternatively, you can also use `combine`, which infers the state so that you do not need to type it.
 
 ```ts
-import create from 'zustand'
-import { combine } from 'zustand/middleware'
+import create from '@pavlobu/zustand'
+import { combine } from '@pavlobu/zustand/middleware'
 
 const useBearStore = create(
   combine({ bears: 0 }, (set) => ({
@@ -166,8 +166,8 @@ Note that we don't use the curried version when using `combine` because `combine
 You do not have to do anything special to use middlewares in TypeScript.
 
 ```ts
-import create from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
+import create from '@pavlobu/zustand'
+import { devtools, persist } from '@pavlobu/zustand/middleware'
 
 interface BearState {
   bears: number
@@ -187,8 +187,8 @@ const useBearStore = create<BearState>()(
 Just make sure you are using them immediately inside `create` so as to make the contextual inference work. Doing something even remotely fancy like the following `myMiddlewares` would require more advanced types.
 
 ```ts
-import create from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
+import create from '@pavlobu/zustand'
+import { devtools, persist } from '@pavlobu/zustand/middleware'
 
 const myMiddlewares = (f) => devtools(persist(f))
 
@@ -212,7 +212,7 @@ Also, we recommend using `devtools` middleware as last as possible. For example,
 Imagine you had to write this hypothetical middleware.
 
 ```ts
-import create from 'zustand'
+import create from '@pavlobu/zustand'
 
 const foo = (f, bar) => (set, get, store) => {
   store.foo = bar
@@ -234,7 +234,7 @@ If you are eager to know what the answer is to this particular problem then you 
 ### Middleware that doesn't change the store type
 
 ```ts
-import create, { State, StateCreator, StoreMutatorIdentifier } from 'zustand'
+import create, { State, StateCreator, StoreMutatorIdentifier } from '@pavlobu/zustand'
 
 type Logger = <
   T extends State,
@@ -285,7 +285,7 @@ import create, {
   StoreMutatorIdentifier,
   Mutate,
   StoreApi,
-} from 'zustand'
+} from '@pavlobu/zustand'
 
 type Foo = <
   T extends State,
@@ -356,7 +356,7 @@ const useBearStore = create<
 ### Slices pattern
 
 ```ts
-import create, { StateCreator } from 'zustand'
+import create, { StateCreator } from '@pavlobu/zustand'
 
 interface BearSlice {
   bears: number

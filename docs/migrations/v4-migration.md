@@ -9,7 +9,7 @@ Also it's recommended to first read the new [TypeScript Guide](../guides/typescr
 
 In addition to this migration guide you can also check the diff of the test files in the repo from v3 to v4.
 
-## `create` (from `zustand` and `zustand/vanilla`)
+## `create` (from `@pavlobu/zustand` and `@pavlobu/zustand/vanilla`)
 
 ### Change
 
@@ -31,7 +31,7 @@ In addition to this migration guide you can also check the diff of the test file
 
 If you're not passing any type parameters to `create` then there is no migration needed. If you're using a "leaf" middleware like `combine` or `redux` then remove all type parameters from `create`. Else replace `create<T, ...>(...)` with `create<T>()(...)`.
 
-## `StateCreator` (from `zustand` and `zustand/vanilla`)
+## `StateCreator` (from `@pavlobu/zustand` and `@pavlobu/zustand/vanilla`)
 
 ### Change
 
@@ -56,7 +56,7 @@ If you're not passing any type parameters to `create` then there is no migration
 
 If you're using `StateCreator` you're likely authoring a middleware or using the "slices" pattern, for that check the TypeScript Guide's ["Authoring middlewares and advanced usage"](../guides/typescript.md#authoring-middlewares-and-advanced-usage) and ["Common recipes"](../guides/typescript.md#common-recipes) sections.
 
-## `PartialState` (from `zustand` and `zustand/vanilla`)
+## `PartialState` (from `@pavlobu/zustand` and `@pavlobu/zustand/vanilla`)
 
 ### Change
 
