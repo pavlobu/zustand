@@ -19,10 +19,11 @@ with this `REACT_APP_CUSTOM_NODE_ENV` variable for basic usage.
 
 ## Demo of redux devtools rewind feature 
 In this demo you can see a Redux Devtools Extension state rewind feature in action, when multiple zustand stores connected to one Redux Devtools Extension connection.
-The code for this demo can be found here: [example/dev-env-devtools-many-stores](examples/dev-env-devtools-many-stores/)
+The code for this demo gif is in this current project. Here is the [link](https://github.com/pavlobu/zustand/tree/%40pavlobu-zustand-devtools-middleware/examples/dev-env-devtools-many-stores) in case if you need it
 
 
-![demo of zustand devtools middleware by pavlobu. showing how redux devtools rewind feature works](docs/img/zustand-devtools-rewind.gif)
+
+![demo of zustand devtools middleware by pavlobu. showing how redux devtools rewind feature works](https://github.com/pavlobu/zustand/blob/e0ffeebebfb825f30c36992f2110f978f4f44c93/examples/dev-env-devtools-many-stores/docs/img/zustand-devtools-rewind.gif)
 
 # Getting Started with this demo project
 
