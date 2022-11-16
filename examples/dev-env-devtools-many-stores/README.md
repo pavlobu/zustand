@@ -40,8 +40,6 @@ The code for this demo gif is in this current project. Here is the [link](https:
 
 ---
 
----
-
 # Getting Started with this demo project
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
