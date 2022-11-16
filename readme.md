@@ -1,9 +1,37 @@
 # @pavlobu/zustand
 
-This is a better zustand middleware by @pavlobu
-
+This is a better zustand middleware.
+Use `@pavlobu/zustand` everywhere you use `zustand` instead of `zustand` to leverage features of this project.
 ### This project is based on https://github.com/pmndrs/zustand
 Please read [original readme](https://github.com/pmndrs/zustand#readme)
+## Quickstart
+`npm i @pavlobu/zustand`
+
+### Usage example `js`:
+```js
+import { devOnlyDevtools as devtools } from '@pavlobu/zustand/middleware';
+import { immer } from '@pavlobu/zustand/middleware/immer';
+import create from '@pavlobu/zustand';
+
+export const useBearsStore = create(devtools(immer((set) => ({
+  bears: 0,
+  increasePopulation: () => set((store) => {
+    store.bears += 1;
+  }, false, { type: 'increasePopulation' }),
+  removeBear: () => set((state) => {
+    state.bears -= 1;
+  }, false, { type: 'removeBear' }),
+  removeAllBears: () => set((state) => {
+    state.bears = 0;
+  }, false, { type: 'removeAllBears' }),
+  setSpecificBearsAmount: (amount) => set((state) => {
+    state.bears = amount;
+  }, false, { type: 'setSpecificBearsAmount' }),
+})), { name: '@pavlobu/zustand', store: 'app/bears' }));
+```
+
+### Usage example `ts`
+[In this demo project](https://github.com/pavlobu/zustand/tree/%40pavlobu-zustand-devtools-middleware/examples/dev-env-devtools-many-stores)
 
 # Improvements in this repo `devtools` middleware:
 Demo react project with example of following improvements can be found [here](https://github.com/pavlobu/zustand/tree/%40pavlobu-zustand-devtools-middleware/examples/dev-env-devtools-many-stores)
