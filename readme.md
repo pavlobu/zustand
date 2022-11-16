@@ -48,3 +48,8 @@ The code for this demo can be found [here](https://github.com/pavlobu/zustand/tr
 
 ![demo of zustand devtools middleware by pavlobu. showing how redux devtools rewind feature works](https://github.com/pavlobu/zustand/blob/e0ffeebebfb825f30c36992f2110f978f4f44c93/examples/dev-env-devtools-many-stores/docs/img/zustand-devtools-rewind.gif)
 
+## Note on versioning
+`@pavlobu/zustand` is based on original `zustand`
+The versions are kept the same as in `zustand` but with `-<number>` suffixes.
+For example first fix of `zustand@4.1.4` version would make 
+`@pavlobu/zustand@4.1.4-1` verison for current package.

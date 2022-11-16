@@ -8,8 +8,8 @@ nav: 12
 If you want to connect state of a store to URL hash, you can create your own hash storage.
 
 ```ts
-import create from 'zustand'
-import { persist, StateStorage } from 'zustand/middleware'
+import create from '@pavlobu/zustand'
+import { persist, StateStorage } from '@pavlobu/zustand/middleware'
 
 const hashStorage: StateStorage = {
   getItem: (key): string => {

@@ -6,7 +6,7 @@ nav: 13
 The following pattern can be used to reset the state to its initial value.
 
 ```ts
-import create from 'zustand'
+import create from '@pavlobu/zustand'
 
 // define types for state values and actions separately
 type State = {
@@ -47,7 +47,7 @@ const useSlice = create<State & Actions>((set, get) => ({
 Resetting multiple stores at once instead of individual stores
 
 ```ts
-import _create, { StateCreator, StoreApi, UseBoundStore } from 'zustand'
+import _create, { StateCreator, StoreApi, UseBoundStore } from '@pavlobu/zustand'
 
 const resetters: (() => void)[] = []
 
