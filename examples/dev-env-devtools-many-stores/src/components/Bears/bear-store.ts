@@ -3,7 +3,6 @@ import { immer } from '@pavlobu/zustand/middleware/immer';
 import { reactDevtoolsConnectionName } from '../../utils/redux-devtools/constants';
 import create from '@pavlobu/zustand';
 
-
 export interface BearsState {
   bears: number;
   increasePopulation: () => void;
