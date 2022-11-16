@@ -1,7 +1,7 @@
-import { devOnlyDevtools as devtools } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+import { devOnlyDevtools as devtools } from '@pavlobu/zustand/middleware';
+import { immer } from '@pavlobu/zustand/middleware/immer';
 import { reactDevtoolsConnectionName } from '../../utils/redux-devtools/constants';
-import create from 'zustand';
+import create from '@pavlobu/zustand';
 
 export interface BeesState {
   bees: number;

@@ -1,7 +1,7 @@
 {
   "name": "@pavlobu/zustand",
   "private": true,
-  "version": "1.0.2",
+  "version": "4.1.4",
   "description": "improved zustand by @pavlobu",
   "main": "./index.js",
   "types": "./index.d.ts",
