@@ -234,7 +234,11 @@ If you are eager to know what the answer is to this particular problem then you 
 ### Middleware that doesn't change the store type
 
 ```ts
-import create, { State, StateCreator, StoreMutatorIdentifier } from '@pavlobu/zustand'
+import create, {
+  State,
+  StateCreator,
+  StoreMutatorIdentifier,
+} from '@pavlobu/zustand'
 
 type Logger = <
   T extends State,
