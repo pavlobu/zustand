@@ -3,13 +3,20 @@ import './App.css';
 import {
   AddBear,
   AddBee,
+  AddRabbit,
+  AddWolf,
   NukeBears,
   NukeBees,
+  NukeRabbits,
+  NukeWolves,
   RemoveBear,
   RemoveBee,
   RemoveRabbit,
+  RemoveWolf,
   ShowBears,
   ShowBees,
+  ShowRabbits,
+  ShowWolves,
   SpecificBearsAmount,
   SpecificBeesAmount,
   SpecificRabbitsAmount,
@@ -19,6 +26,10 @@ import { Bears } from './components/Bears';
 import { Bees } from './components/Bees';
 import { useBearsStore } from './components/Bears/bear-store';
 import React from 'react';
+import { useWolvesStore } from './components/Wolves/wolves-store';
+import { useRabbitsStore } from './components/Rabbits/rabbits-store';
+import { Wolves } from './components/Wolves';
+import { Rabbits } from './components/Rabbits';
 
 const App = () => {
   const isZeroBears = useBearsStore((state) => state.bears) === 0;
@@ -73,15 +84,4 @@ const App = () => {
 };
 
 // eslint-disable-next-line import/no-default-export
-export default App;import { ShowWolves } from './components/ActionButtons/index';
-import { RemoveWolf } from './components/ActionButtons/index';
-import { AddWolf } from './components/ActionButtons/index';
-import { NukeWolves } from './components/ActionButtons/index';
-import { useWolvesStore } from './components/Wolves/wolves-store';
-import { Wolves } from './components/Wolves/index';
-import { ShowRabbits } from './components/ActionButtons/index';
-import { AddRabbit } from './components/ActionButtons/index';
-import { NukeRabbits } from './components/ActionButtons/index';
-import { Rabbits } from './components/Rabbits/index';
-import { useRabbitsStore } from './components/Rabbits/rabbits-store';
-
+export default App;

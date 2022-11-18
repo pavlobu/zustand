@@ -38,7 +38,7 @@ The code for this demo gif is in this current project. Here is the [link](https:
 ![demo of zustand devtools middleware by pavlobu. showing how redux devtools rewind feature works](https://github.com/pavlobu/zustand/blob/e0ffeebebfb825f30c36992f2110f978f4f44c93/examples/dev-env-devtools-many-stores/docs/img/zustand-devtools-rewind.gif)
 
 ---
----
+
 # Getting Started with this demo project
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

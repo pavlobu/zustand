@@ -17,15 +17,9 @@ export const ShowBears: FC = () => {
 };
 
 export const ShowBees: FC = () => {
-  const bees = useBeesStore((state) => state.bees);
-  return (
-    <p>
-      {bees}
-      {' '}
-      bees in the forest
-    </p>
-  );
-};
+  const bees = useBeesStore((state) => state.bees)
+  return <p>{bees} bees in the forest</p>
+}
 
 export const ShowRabbits: FC = () => {
   const rabbits = useRabbitsStore((state) => state.rabbits);
