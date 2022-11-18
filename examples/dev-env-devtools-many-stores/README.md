@@ -4,13 +4,18 @@ This demo shows you how to use redux devtools with @pavlobu/zustand-middleware.
 This project is based on Create React App.
 
 ## Note on devOnlyDevtools() usage
-Use this `import { devOnlyDevtools } from '@pavlobu/zustand` export instead of standard `devtools` export of zustand.
-This helps to remove react devtools in prod build with less hustle.
-#### A small react refresher:
-* When running `npm run build` `NODE_ENV` is `production`. But
-* when running `npm run start` `NODE_ENV` is `development`. 
 
-#### *This may be not flexible in some cases.* 
+This is an example, its not included in the main repo. Use devOnlyDevtools instead 
+of standard `devtools` of zustand.
+This helps to remove react devtools in prod build with less hustle.
+
+#### A small react refresher:
+
+- When running `npm run build` `NODE_ENV` is `production`. But
+- when running `npm run start` `NODE_ENV` is `development`.
+
+#### _This may be not flexible in some cases._
+
 For example if you need to have a non-prod build of this react on lower environments
 `dev`, `qa`, `uat` etc.
 But we have a solution. In this demo we are using `npm run build:dev` and `npm run build:prod`
