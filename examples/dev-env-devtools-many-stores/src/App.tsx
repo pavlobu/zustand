@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import './App.css'
+import './App.css';
 import {
   AddBear,
   AddBee,
@@ -21,21 +21,21 @@ import {
   SpecificBeesAmount,
   SpecificRabbitsAmount,
   SpecificWolvesAmount,
-} from './components/ActionButtons'
-import { Bears } from './components/Bears'
-import { Bees } from './components/Bees'
-import { useBearsStore } from './components/Bears/bear-store'
-import React from 'react'
-import { useWolvesStore } from './components/Wolves/wolves-store'
-import { useRabbitsStore } from './components/Rabbits/rabbits-store'
-import { Wolves } from './components/Wolves'
-import { Rabbits } from './components/Rabbits'
+} from './components/ActionButtons';
+import { Bears } from './components/Bears';
+import { Bees } from './components/Bees';
+import { Rabbits } from './components/Rabbits';
+import { Wolves } from './components/Wolves';
+import { useBearsStore } from './components/Bears/bear-store';
+import { useRabbitsStore } from './components/Rabbits/rabbits-store';
+import { useWolvesStore } from './components/Wolves/wolves-store';
+import React from 'react';
 
 const App = () => {
-  const isZeroBears = useBearsStore((state) => state.bears) === 0
-  const isZeroBees = useBearsStore((state) => state.bears) === 0
-  const isZeroWolves = useWolvesStore((state) => state.wolves) === 0
-  const isZeroRabbits = useRabbitsStore((state) => state.rabbits) === 0
+  const isZeroBears = useBearsStore((state) => state.bears) === 0;
+  const isZeroBees = useBearsStore((state) => state.bears) === 0;
+  const isZeroWolves = useWolvesStore((state) => state.wolves) === 0;
+  const isZeroRabbits = useRabbitsStore((state) => state.rabbits) === 0;
 
   return (
     <div className="App">
@@ -80,8 +80,8 @@ const App = () => {
       <Rabbits />
       <br />
     </div>
-  )
-}
+  );
+};
 
 // eslint-disable-next-line import/no-default-export
-export default App
+export default App;
