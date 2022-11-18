@@ -1,7 +1,7 @@
-import { devOnlyDevtools as devtools } from '@pavlobu/zustand/middleware'
 import { immer } from '@pavlobu/zustand/middleware/immer'
 import { reactDevtoolsConnectionName } from '../../constants'
 import create from '@pavlobu/zustand'
+import { devOnlyDevtools as devtools } from '../../utils-devtools'
 
 export interface BeesState {
   bees: number

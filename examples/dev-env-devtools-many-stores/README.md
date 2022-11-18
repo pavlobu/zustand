@@ -6,7 +6,8 @@ This project is based on Create React App.
 
 ## Note on devOnlyDevtools() usage
 
-Use this `import { devOnlyDevtools } from '@pavlobu/zustand` export instead of standard `devtools` export of zustand.
+This is an example, its not included in the main repo. Use devOnlyDevtools instead 
+of standard `devtools` of zustand.
 This helps to remove react devtools in prod build with less hustle.
 
 #### A small react refresher:
