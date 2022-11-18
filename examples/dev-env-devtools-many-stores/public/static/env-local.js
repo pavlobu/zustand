@@ -1,2 +1,1 @@
-ENVIRONMENT = 'local';
-
+ENVIRONMENT = 'local'

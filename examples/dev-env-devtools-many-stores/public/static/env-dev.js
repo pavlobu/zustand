@@ -1,2 +1,1 @@
-ENVIRONMENT = 'development';
-
+ENVIRONMENT = 'development'
