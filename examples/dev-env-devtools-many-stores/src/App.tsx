@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import './App.css'
+import './App.css';
 import {
   AddBear,
   AddBee,
@@ -80,8 +80,8 @@ const App = () => {
       <Rabbits />
       <br />
     </div>
-  )
-}
+  );
+};
 
 // eslint-disable-next-line import/no-default-export
-export default App
+export default App;
