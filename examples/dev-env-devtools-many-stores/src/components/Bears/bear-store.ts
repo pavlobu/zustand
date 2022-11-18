@@ -1,6 +1,6 @@
-import { devOnlyDevtools as devtools } from '@pavlobu/zustand/middleware';
+import { devOnlyDevtools as devtools } from '../../utils-devtools';
 import { immer } from '@pavlobu/zustand/middleware/immer';
-import { reactDevtoolsConnectionName } from '../../utils/redux-devtools/constants';
+import { bearsAndBeesConnectionGroupName } from '../../constants';
 import create from '@pavlobu/zustand';
 
 export interface BearsState {
@@ -25,4 +25,4 @@ export const useBearsStore = create<BearsState>()(devtools(immer((set) => ({
   setSpecificBearsAmount: (amount: number) => set((state) => {
     state.bears = amount;
   }, false, { type: 'setSpecificBearsAmount' }),
-})), { name: reactDevtoolsConnectionName, store: 'app/bears' }));
+})), { name: bearsAndBeesConnectionGroupName, store: 'app/bears' }));

@@ -7,5 +7,5 @@
  * of redux devtools extension, without having to switch between different connection tabs from
  * the dropdown menu, which may be very inconvenient.
  */
-export const reactDevtoolsConnectionName =
-  'Bears & Bees - demo for better zustand devtools middleware'
+export const bearsAndBeesConnectionGroupName = 'Bears & Bees - devtools connection demo';
+export const rabbitsAndWolvesConnectionGroupName = 'Rabbits & Wolves - devtools connection demo';
