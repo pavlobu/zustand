@@ -1,6 +1,5 @@
 # Better zustand devtools by @pavlobu
-
-This demo shows you how to use redux devtools with @pavlobu/zustand-middleware.
+This demo shows you how to use redux devtools with @pavlobu/zustand-middleware. 
 
 This project is based on Create React App.
 
@@ -23,22 +22,23 @@ But we have a solution. In this demo we are using `npm run build:dev` and `npm r
 commands that read `.env.production` and `.env.development` files.
 
 The important variable in those `.env.*` files is `REACT_APP_CUSTOM_NODE_ENV`, if it's set
-and it's value is `production` then devtools will be excluded, so you don't have to remove devOnlyDevtools() middleware wrapper on all of your zustand stores for prod build.
+and it's value is `production` then devtools will be excluded, so you don't have to remove devOnlyDevtools() middleware wrapper on all of your zustand stores for prod build. 
 This variable is handled by `@pavlobu/zustand` package internally. But you don't have to create these `.env.*` files
-with this `REACT_APP_CUSTOM_NODE_ENV` variable for basic usage.
-
-### _Simple `npm run build` will also remove redux devtools middleware, because it's treated as prod build by default._
+with this `REACT_APP_CUSTOM_NODE_ENV` variable for basic usage. 
+### *Simple `npm run build` will also remove redux devtools middleware, because it's treated as prod build by default.*
 
 ---
 
-## Demo of redux devtools rewind feature
-
+## Demo of redux devtools rewind feature 
 In this demo you can see a Redux Devtools Extension state rewind feature in action, when multiple zustand stores connected to one Redux Devtools Extension connection.
 The code for this demo gif is in this current project. Here is the [link](https://github.com/pavlobu/zustand/tree/%40pavlobu-zustand-devtools-middleware/examples/dev-env-devtools-many-stores) in case if you need it
+
+
 
 ![demo of zustand devtools middleware by pavlobu. showing how redux devtools rewind feature works](https://github.com/pavlobu/zustand/blob/e0ffeebebfb825f30c36992f2110f978f4f44c93/examples/dev-env-devtools-many-stores/docs/img/zustand-devtools-rewind.gif)
 
 ---
+
 # Getting Started with this demo project
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

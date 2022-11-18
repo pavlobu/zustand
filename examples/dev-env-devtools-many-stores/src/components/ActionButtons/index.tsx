@@ -6,9 +6,15 @@ import { useRabbitsStore } from '../Rabbits/rabbits-store';
 import { useWolvesStore } from '../Wolves/wolves-store';
 
 export const ShowBears: FC = () => {
-  const bears = useBearsStore((state) => state.bears)
-  return <p>{bears} bears in the forest</p>
-}
+  const bears = useBearsStore((state) => state.bears);
+  return (
+    <p>
+      {bears}
+      {' '}
+      bears in the forest
+    </p>
+  );
+};
 
 export const ShowBees: FC = () => {
   const bees = useBeesStore((state) => state.bees)
@@ -48,24 +54,14 @@ export const RemoveBear: FC = () => {
 };
 
 export const NukeBears: FC = () => {
-  const removeAllBears = useBearsStore((state) => state.removeAllBears)
-  return (
-    <button type="button" onClick={() => removeAllBears()}>
-      Nuke all bears
-    </button>
-  )
-}
+  const removeAllBears = useBearsStore((state) => state.removeAllBears);
+  return <button type="button" onClick={() => removeAllBears()}>Nuke all bears</button>;
+};
 
 export const SpecificBearsAmount: FC = () => {
-  const specificBearsAmount = useBearsStore(
-    (state) => state.setSpecificBearsAmount
-  )
-  return (
-    <button type="button" onClick={() => specificBearsAmount(25)}>
-      Set 25 bears
-    </button>
-  )
-}
+  const specificBearsAmount = useBearsStore((state) => state.setSpecificBearsAmount);
+  return <button type="button" onClick={() => specificBearsAmount(25)}>Set 25 bears</button>;
+};
 
 export const AddBee: FC = () => {
   const incrementBees = useBeesStore((state) => state.increasePopulation);
@@ -79,13 +75,9 @@ export const RemoveBee: FC = () => {
 };
 
 export const NukeBees: FC = () => {
-  const removeAllBees = useBeesStore((state) => state.removeAllBees)
-  return (
-    <button type="button" onClick={() => removeAllBees()}>
-      Nuke all bees
-    </button>
-  )
-}
+  const removeAllBees = useBeesStore((state) => state.removeAllBees);
+  return <button type="button" onClick={() => removeAllBees()}>Nuke all bees</button>;
+};
 
 export const SpecificBeesAmount: FC = () => {
   const specificBeesAmount = useBeesStore((state) => state.setSpecificBeesAmount);

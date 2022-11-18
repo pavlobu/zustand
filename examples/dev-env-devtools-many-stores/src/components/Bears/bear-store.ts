@@ -4,11 +4,11 @@ import { bearsAndBeesConnectionGroupName } from '../../constants';
 import create from '@pavlobu/zustand';
 
 export interface BearsState {
-  bears: number
-  increasePopulation: () => void
-  removeBear: () => void
-  removeAllBears: () => void
-  setSpecificBearsAmount: (n: number) => void
+  bears: number;
+  increasePopulation: () => void;
+  removeBear: () => void;
+  removeAllBears: () => void;
+  setSpecificBearsAmount: (n: number) => void;
 }
 
 export const useBearsStore = create<BearsState>()(devtools(immer((set) => ({

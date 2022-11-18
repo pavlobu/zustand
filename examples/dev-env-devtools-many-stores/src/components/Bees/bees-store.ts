@@ -4,11 +4,11 @@ import { immer } from '@pavlobu/zustand/middleware/immer';
 import create from '@pavlobu/zustand';
 
 export interface BeesState {
-  bees: number
-  increasePopulation: () => void
-  removeBee: () => void
-  removeAllBees: () => void
-  setSpecificBeesAmount: (n: number) => void
+  bees: number;
+  increasePopulation: () => void;
+  removeBee: () => void;
+  removeAllBees: () => void;
+  setSpecificBeesAmount: (n: number) => void;
 }
 
 export const useBeesStore = create<BeesState>()(devtools(immer((set) => ({

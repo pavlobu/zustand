@@ -398,6 +398,7 @@ const devtoolsImpl: DevtoolsImpl =
           return
       }
     })
+
     return initialState
   }
 export const devtools = devtoolsImpl as unknown as Devtools
