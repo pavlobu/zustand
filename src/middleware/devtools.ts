@@ -179,7 +179,6 @@ const devtoolsImpl: DevtoolsImpl =
     type S = ReturnType<typeof fn> & { [store: string]: S }
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
-    const { enabled, anonymousActionType, ...options } = devtoolsOptions
     let extensionConnector:
       | typeof window['__REDUX_DEVTOOLS_EXTENSION__']
       | false
