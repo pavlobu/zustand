@@ -27,13 +27,14 @@ import { Bees } from './components/Bees';
 import { Rabbits } from './components/Rabbits';
 import { Wolves } from './components/Wolves';
 import { useBearsStore } from './components/Bears/bear-store';
+import { useBeesStore } from './components/Bees/bees-store';
 import { useRabbitsStore } from './components/Rabbits/rabbits-store';
 import { useWolvesStore } from './components/Wolves/wolves-store';
 import React from 'react';
 
 const App = () => {
   const isZeroBears = useBearsStore((state) => state.bears) === 0;
-  const isZeroBees = useBearsStore((state) => state.bears) === 0;
+  const isZeroBees = useBeesStore((state) => state.bears) === 0;
   const isZeroWolves = useWolvesStore((state) => state.wolves) === 0;
   const isZeroRabbits = useRabbitsStore((state) => state.rabbits) === 0;
 
