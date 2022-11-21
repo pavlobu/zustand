@@ -34,7 +34,7 @@ import React from 'react';
 
 const App = () => {
   const isZeroBears = useBearsStore((state) => state.bears) === 0;
-  const isZeroBees = useBeesStore((state) => state.bears) === 0;
+  const isZeroBees = useBeesStore((state) => state.bees) === 0;
   const isZeroWolves = useWolvesStore((state) => state.wolves) === 0;
   const isZeroRabbits = useRabbitsStore((state) => state.rabbits) === 0;
 
