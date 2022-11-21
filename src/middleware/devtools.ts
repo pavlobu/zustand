@@ -151,24 +151,35 @@ export type NamedSet<T> = WithDevtools<StoreApi<T>>['setState']
 type ConnectResponse = ReturnType<
   NonNullable<Window['__REDUX_DEVTOOLS_EXTENSION__']>['connect']
 >
-const connections: Record<string, ConnectResponse> = {}
+const connections: Map<string | undefined, ConnectResponse> = new Map()
 
-const storeApis: (StoreApi<any> & { store: string })[] = []
-const initialStoreStates: (any & { store: string })[] = []
+type ConnectionStoreApis = (StoreApi<any> & { store: string })[]
+const connectionStoreApis: Map<string | undefined, ConnectionStoreApis> =
+  new Map()
+type ConnectionInitialStoreStates = (any & { store: string })[]
+const connectionInitialStoreStates: Map<
+  string | undefined,
+  ConnectionInitialStoreStates
+> = new Map()
 
-const getCurrentStoresStates = () => {
-  const storesStates = storeApis.map((storeApi) => ({
+const getCurrentConnectionStoresStates = (
+  name: string | undefined
+): Record<string, any> => {
+  let api = connectionStoreApis.get(name)
+  if (api === undefined) {
+    const arr: NonNullable<ConnectionStoreApis> = []
+    connectionStoreApis.set(name, arr)
+    api = arr
+  }
+  const states = api.map((storeApi) => ({
     ...storeApi.getState(),
     store: storeApi.store,
   }))
-  const currentStates: Record<
-    string,
-    ReturnType<StoreApi<any>['getState']>
-  > = {}
-  storesStates.forEach((storeState) => {
-    currentStates[storeState.store] = storeState
+  const res: Record<string, ReturnType<StoreApi<any>['getState']>> = {}
+  states.forEach((storeState) => {
+    res[storeState.store] = storeState
   })
-  return currentStates
+  return res
 }
 
 const devtoolsImpl: DevtoolsImpl =
@@ -198,11 +209,10 @@ const devtoolsImpl: DevtoolsImpl =
       return fn(set, get, api)
     }
 
-    const name = options.name ?? ''
-    let connection = connections[name]
-    if (store !== undefined && connections[name] === undefined) {
+    let connection = connections.get(options.name)
+    if (store !== undefined && connections.get(options.name) === undefined) {
       const connectResponse = extensionConnector.connect(options)
-      connections[name] = connectResponse
+      connections.set(options.name, connectResponse)
       connection = connectResponse
     }
     if (store === undefined) {
@@ -243,7 +253,7 @@ const devtoolsImpl: DevtoolsImpl =
         return { type: anonymousActionType || 'anonymous' }
       }
       connection?.send(getNameOrAction(nameOrAction), {
-        ...getCurrentStoresStates(),
+        ...getCurrentConnectionStoresStates(options.name),
         [store]: { ...api.getState(), store },
       })
       return r
@@ -260,14 +270,25 @@ const devtoolsImpl: DevtoolsImpl =
     if (store === undefined) {
       connection?.init(initialState)
     } else {
-      storeApis.push({ ...api, store })
-      initialStoreStates.push({ ...initialState, store })
+      let storeApis = connectionStoreApis.get(options.name)
+      if (storeApis === undefined) {
+        const arr: NonNullable<ConnectionStoreApis> = []
+        connectionStoreApis.set(options.name, arr)
+        storeApis = arr
+      }
+      storeApis?.push({ ...api, store })
+      let initStates = connectionInitialStoreStates.get(options.name)
+      if (initStates === undefined) {
+        const arr: NonNullable<ConnectionInitialStoreStates> = []
+        connectionInitialStoreStates.set(options.name, arr)
+        initStates = arr
+      }
+      initStates?.push({ ...initialState, store })
       const inits: Record<string, S> = {}
-      initialStoreStates.forEach((storeState) => {
+      initStates?.forEach((storeState) => {
         inits[storeState.store] = storeState
       })
       connection?.init(inits)
-      console.warn('zustand initialized with initial state', inits)
     }
 
     if (
@@ -340,14 +361,18 @@ const devtoolsImpl: DevtoolsImpl =
               if (store === undefined) {
                 return connection?.init(api.getState())
               }
-              return connection?.init(getCurrentStoresStates())
+              return connection?.init(
+                getCurrentConnectionStoresStates(options.name)
+              )
 
             case 'COMMIT':
               if (store === undefined) {
                 connection?.init(api.getState())
                 return
               }
-              return connection?.init(getCurrentStoresStates())
+              return connection?.init(
+                getCurrentConnectionStoresStates(options.name)
+              )
 
             case 'ROLLBACK':
               return parseJsonThen<S>(message.state, (state) => {
@@ -357,7 +382,7 @@ const devtoolsImpl: DevtoolsImpl =
                   return
                 }
                 setStateFromDevtools(state[store] as S)
-                connection?.init(getCurrentStoresStates())
+                connection?.init(getCurrentConnectionStoresStates(options.name))
               })
 
             case 'JUMP_TO_STATE':
@@ -402,20 +427,6 @@ const devtoolsImpl: DevtoolsImpl =
     return initialState
   }
 export const devtools = devtoolsImpl as unknown as Devtools
-
-const isDevEnv = process.env.REACT_APP_CUSTOM_NODE_ENV
-  ? process.env.REACT_APP_CUSTOM_NODE_ENV !== 'production'
-  : process.env.NODE_ENV !== 'production'
-const devOnlyDevtoolsImpl: DevtoolsImpl =
-  (fn, devtoolsOptions = {}) =>
-  (set, get, api) => {
-    if (isDevEnv) {
-      return devtools(fn, devtoolsOptions)(set, get, api)
-    }
-    return fn(set, get, api)
-  }
-
-export const devOnlyDevtools = devOnlyDevtoolsImpl as unknown as Devtools
 
 const parseJsonThen = <T>(stringified: string, f: (parsed: T) => void) => {
   let parsed: T | undefined
