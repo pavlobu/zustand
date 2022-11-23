@@ -1,7 +1,7 @@
 {
   "name": "@pavlobu/zustand",
   "private": true,
-  "version": "4.1.4-3",
+  "version": "4.1.4-4",
   "description": "improved zustand devtools middleware by @pavlobu",
   "main": "./index.js",
   "types": "./index.d.ts",

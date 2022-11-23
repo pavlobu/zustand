@@ -187,7 +187,9 @@ const devtoolsImpl: DevtoolsImpl =
   (set, get, api) => {
     const { enabled, anonymousActionType, store, ...options } = devtoolsOptions
 
-    type S = ReturnType<typeof fn> & { [store: string]: S }
+    type S = ReturnType<typeof fn> & {
+      [store: string]: S
+    }
     type PartialState = Partial<S> | ((s: S) => Partial<S>)
 
     let extensionConnector:
@@ -238,19 +240,19 @@ const devtoolsImpl: DevtoolsImpl =
         name?: string | { type: unknown }
       ): Action<unknown> {
         if (name !== undefined && typeof name === 'string') {
-          return { type: name }
+          return { type: `${store ? `${store}/` : ''}${name}` }
         }
         if (
           name !== undefined &&
           typeof name !== 'string' &&
           store !== undefined
         ) {
-          return { type: `${store}/${name.type}` }
+          return { ...name, type: `${store}/${name.type}` }
         }
         if (name !== undefined) {
           return name
         }
-        return { type: anonymousActionType || 'anonymous' }
+        return { type: `${store}/${anonymousActionType || 'anonymous'}` }
       }
       connection?.send(getNameOrAction(nameOrAction), {
         ...getCurrentConnectionStoresStates(options.name),
@@ -333,19 +335,35 @@ const devtoolsImpl: DevtoolsImpl =
             message.payload,
             (action) => {
               if (action.type === '__setState') {
-                if (action.type === '__setState') {
-                  if (store === undefined) {
-                    setStateFromDevtools(action.state as PartialState)
-                    return
-                  }
-                  if (
-                    JSON.stringify(api.getState()) !==
-                    JSON.stringify((action.state as S)[store])
-                  ) {
-                    setStateFromDevtools(action.state as S)
-                  }
+                if (store === undefined) {
+                  setStateFromDevtools(action.state as PartialState)
                   return
                 }
+                if (
+                  Object.keys(action.state as S).length > 1 ||
+                  Object.keys(action.state as S).length < 1
+                ) {
+                  console.error(
+                    `
+                    [zustand devtools middleware] Unsupported __setState action format. 
+                    When using 'store' option in devtools(), the 'state' should have only one key, which is a value of 'store' that was passed in devtools(),
+                    and value of this only key should be a state object. Example: { "type": "__setState", "state": { "abc123Store": { "foo": "bar" } } }
+                    `
+                  )
+                }
+                if ((action.state as S)[store] === undefined) {
+                  return
+                }
+                const stateFromDevtools = (action.state as S)[store]
+                if (stateFromDevtools) {
+                  if (
+                    JSON.stringify(api.getState()) !==
+                    JSON.stringify(stateFromDevtools)
+                  ) {
+                    setStateFromDevtools(stateFromDevtools)
+                  }
+                }
+                return
               }
 
               if (!(api as any).dispatchFromDevtools) return
