@@ -1,7 +1,7 @@
 import { devOnlyDevtools as devtools } from '../../utils-devtools';
-import { immer } from '@pavlobu/zustand/middleware/immer';
+import { immer } from 'zustand/middleware/immer';
 import { rabbitsAndWolvesConnectionGroupName } from '../../constants';
-import create from '@pavlobu/zustand';
+import create from 'zustand';
 
 export interface WolvesState {
   wolves: number;

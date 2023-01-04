@@ -1,7 +1,7 @@
 import { bearsAndBeesConnectionGroupName } from '../../constants';
 import { devOnlyDevtools as devtools } from '../../utils-devtools';
-import { immer } from '@pavlobu/zustand/middleware/immer';
-import create from '@pavlobu/zustand';
+import { immer } from 'zustand/middleware/immer';
+import create from 'zustand';
 
 export interface BeesState {
   bees: number;

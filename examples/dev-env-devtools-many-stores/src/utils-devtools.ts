@@ -1,5 +1,5 @@
-import { DevtoolsOptions, devtools } from '@pavlobu/zustand/middleware';
-import { StateCreator, StoreMutatorIdentifier } from '@pavlobu/zustand/vanilla';
+import { DevtoolsOptions, devtools } from 'zustand/middleware';
+import { StateCreator, StoreMutatorIdentifier } from 'zustand/vanilla';
 
 type Devtools = <
   T,
